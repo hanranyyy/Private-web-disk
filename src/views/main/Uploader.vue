@@ -1,3 +1,4 @@
+<!-- 上传 -->
 <template>
   <div class="uploader-panel">
     <div class="uploader-title">
@@ -11,6 +12,7 @@
             {{ item.fileName }}
           </div>
           <div class="progress">
+            <!-- 上传中、秒传时、结束上传时显示进度条 -->
             <el-progress
               :percentage="item.uploadProgress"
               v-if="
@@ -31,6 +33,7 @@
               {{ item.status == 'fail' ? item.errorMsg : STATUS[item.status].desc }}
             </span>
             <!-- 上传中 -->
+            <!-- Utils.sizeToStr 用于将文件大小转换为可读性更好的格式 -->
             <span class="upload-info" v-if="item.status == STATUS.uploading.value">
               {{ Utils.sizeToStr(item.uploadSize) }}/{{ Utils.sizeToStr(item.totalSize) }}
             </span>
@@ -175,6 +178,7 @@ const addFile = async (file, filePid) => {
     errorMsg: null,
   }
   fileList.value.unshift(fileItem)
+  // 文件为空
   if (fileItem.totalSize == 0) {
     fileItem.status = STATUS.emptyfile.value
     return
@@ -186,42 +190,66 @@ const addFile = async (file, filePid) => {
   uploadFile(md5FileUid)
 }
 defineExpose({ addFile })
-// 计算md5
+// 计算md5 用于秒传 前端算好md5 后端通过md5查 查上传文件的file已经在服务器上有了 就不做上传动作 直接进行秒传
+// 当用户需要上传一个文件时，系统会首先计算文件的哈希值（比如MD5），然后将这个哈希值与服务器端已有的文件列表进行比对。
+// 如果服务器已经存在具有相同哈希值的文件，就说明这个文件已经上传过，那么就不需要再次上传整个文件，而是可以直接使用已存在的文件，从而实现“秒传”。
 // 秒传---主要为了看到上传的效果
 const computeMd5 = (fileItem) => {
   let file = fileItem.file
-  // 文件切片
+  // 文件切片 多个浏览器兼容
   let blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice
+  // ceil 向上取整
+  // 总共切几片 chunkSize：一个分片5MB
   let chunks = Math.ceil(file.size / chunkSize)
+  // 当前处理的切片索引
   let currentChunk = 0
+  // 计算文件的 MD5 哈希值
   let spark = new SparkMD5.ArrayBuffer()
+  // 读取文件内容
   let fileReader = new FileReader()
 
   let loadNext = () => {
+    // 当前要处理的分片在文件中的起始位置。currentChunk：当前处理的分片索引 chunkSize：每个分片的大小
     let start = currentChunk * chunkSize
+    // 当前要处理的分片在文件中的结束位置
+    // 如果当前分片的结束位置超过了文件总大小，则将结束位置设置为文件总大小，否则设置为当前分片的起始位置加上分片大小。
     let end = start + chunkSize >= file.size ? file.size : start + chunkSize
+    // 读取文件分片的内容并以 ArrayBuffer 格式进行处理
+    // 用 blobSlice 方法从文件中切割出指定范围的分片数据
     fileReader.readAsArrayBuffer(blobSlice.call(file, start, end))
   }
   loadNext()
   return new Promise((resolve, reject) => {
     let resultFile = getFileByUid(file.uid)
+    // 监听文件读取成功时的事件
     fileReader.onload = (e) => {
+      // 将当前读取的文件片段内容追加到一个名为 spark 的对象
       spark.append(e.target.result)
+      // 增加当前处理的文件片段数
       currentChunk++
+      // 如果当前处理片段未达到总片段数
       if (currentChunk < chunks) {
         // console.log(`第${file.name}分片解析完成，开始第${currentChunk + 1}`)
+        // 更新 MD5 计算进度、加载下一片段
         let percent = Math.floor((currentChunk / chunks) * 100)
         resultFile.md5Progress = percent
         loadNext()
-      } else {
+      } 
+      // 已处理完所有片段 进行最后的 MD5 计算和状态更新操作
+      else {
+        // 生成最终的 MD5 值
         let md5 = spark.end()
+        // 销毁 spark 对象
         spark.destroy()
+        // 将 MD5 计算进度更新为 100%
         resultFile.md5Progress = 100
+        // 更新文件对象的状态为上传中
         resultFile.status = STATUS.uploading.value
         resultFile.md5 = md5
         resolve(fileItem.uid)
       }
     }
+    // 监听文件读取失败时的事件
     fileReader.onerror = () => {
       resultFile.md5Progress = -1
       resultFile.status = STATUS.fail.value
@@ -233,6 +261,7 @@ const computeMd5 = (fileItem) => {
 }
 // 获取文件
 // uid是element-ui在文件上传时生成的唯一标志位
+// 根据给定的 uid 在文件列表 fileList.value 中查找对应的文件对象
 const getFileByUid = (uid) => {
   let file = fileList.value.find((item) => {
     return item.file.uid == uid
@@ -240,7 +269,8 @@ const getFileByUid = (uid) => {
   return file
 }
 const emit = defineEmits(['uploadCallback'])
-const uploadFile = async (uid, chunkIndex) => {
+ // chunkIndex 第几片开始
+  const uploadFile = async (uid, chunkIndex) => {
   chunkIndex = chunkIndex ? chunkIndex : 0
   // 分片上传
   let currentFile = getFileByUid(uid)

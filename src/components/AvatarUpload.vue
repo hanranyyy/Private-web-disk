@@ -1,3 +1,4 @@
+<!-- 头像上传 -->
 <template>
   <div class="avatar-upload">
     <div class="avatar-show">

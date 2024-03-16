@@ -40,6 +40,7 @@ const fileTypeMap = {
   10: { desc: '其他文件', icon: 'others' }
 }
 const getImage=()=>{
+  // 如果有封面
   if(props.cover){
     return proxy.globalInfo.imageUrl + props.cover
   }

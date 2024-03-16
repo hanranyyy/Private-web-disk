@@ -3,7 +3,7 @@
     <div class="header">
       <div class="logo">
         <span class="iconfont icon-pan"></span>
-        <div class="name">Easy云盘</div>
+        <div class="name">Private-web-disk</div>
       </div>
       <div class="right-panel">
         <el-popover
@@ -18,6 +18,7 @@
           <template #reference>
             <span class="iconfont icon-transfer"></span>
           </template>
+          <!-- 上传任务 -->
           <template #default>
             <Uploader ref="uploaderRef" @uploadCallback="uploadCallbackHandler"></Uploader>
           </template>
@@ -34,6 +35,7 @@
             </div>
             <div class="nick-name">{{ userInfo.nickName }}</div>
           </div>
+          <!-- 下拉菜单 -->
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="updateAvatar">修改头像</el-dropdown-item>
@@ -46,6 +48,7 @@
     </div>
     <div class="body">
       <div class="left-sider">
+        <!-- 目录 -->
         <div class="menu-list">
           <template v-for="item in menus">
             <div
@@ -58,7 +61,9 @@
             </div>
           </template>
         </div>
+        <!-- 二级目录 -->
         <div class="menu-sub-list">
+          <!-- 如果是当前选中的 进行高亮 -->
           <div
             :class="['menu-item-sub', currenPath == sub.path ? 'active' : '']"
             v-for="sub in currenMenu.children"
@@ -67,9 +72,11 @@
             <span :class="['iconfont', 'icon-' + sub.icon]" v-if="sub.icon"></span>
             <span class="text">{{ sub.name }}</span>
           </div>
+          <!-- 展示提示文字 -->
           <div class="tops" v-if="currenMenu && currenMenu.tips">
             {{ currenMenu.tips }}
           </div>
+          <!-- 空间使用 -->
           <div class="space-info">
             <div>空间使用</div>
             <div class="percent">
@@ -233,25 +240,33 @@ const menus = [
 const currenMenu = ref({})
 const currenPath = ref()
 const jump = (data) => {
+  // 如果不为空或者为当前选中的
   if (!data.path || data.menuCode == currenMenu.value.menuCode) {
     return
   }
   router.push(data.path)
 }
+
 const setMenu = (menuCode, path) => {
+   // 找到具有相应菜单代码的菜单项
   const menu = menus.find((item) => {
     return item.menuCode == menuCode
   })
+  // 将找到的菜单项和路径分别赋值给 currenMenu 和 currenPath
   currenMenu.value = menu
   currenPath.value = path
 }
+// 监听 route 对象的变化
 watch(
   () => route,
+   // 当 route 变化时触发的回调函数
   (newVal, oldVal) => {
+    // 如果新的 route 具有 meta.menuCode 属性，则调用 setMenu 函数
     if (newVal.meta.menuCode) {
       setMenu(newVal.meta.menuCode, newVal.path)
     }
   },
+   // 设置选项，表示立即执行回调，并深度监听对象的属性变化
   { immediate: true, deep: true },
 )
 // 修改头像
@@ -259,6 +274,7 @@ const updateAvatarRef = ref()
 const updateAvatar = () => {
   updateAvatarRef.value.show(userInfo.value)
 }
+// 重新加载用户头像并更新相关数据
 const reloadAvatar = () => {
   userInfo.value = proxy.VueCookies.get('userInfo')
   timestamp.value = new Date().getTime()

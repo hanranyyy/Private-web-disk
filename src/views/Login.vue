@@ -1,6 +1,8 @@
 <template>
   <div class="login-body">
+    <!-- 背景图 -->
     <div class="bg"></div>
+    <!-- 登录框 -->
     <div class="login-panel">
       <el-form
         class="login-register"
@@ -9,7 +11,7 @@
         ref="formDataRef"
         @submit.prevent
       >
-        <div class="login-title">EasyPan</div>
+        <div class="login-title">Private-web-disk</div>
         <!--邮箱-->
         <el-form-item prop="email">
           <el-input size="large" clearable placeholder="请输入邮箱" v-model.trim="formData.email">
@@ -53,8 +55,8 @@
               <div>
                 <p>1：在垃圾箱里查找邮箱验证码</p>
                 <p>2：在邮箱中设置头像=>设置->反垃圾=>白名单=>设置邮箱白名单</p>
-                <p>3：将邮箱【laoluo@wuhancoder.com】加入白名单</p>
-                <a href="http://easybbs.wuhancoder.com/post/46lrsLUQjQhpZyP" class="a-link"
+                <p>3：将邮箱[1024819848@qq.com]加入白名单</p>
+                <a href="https://blog.csdn.net/haoranyyy/article/details/136261453?spm=1001.2014.3001.5502" class="a-link"
                   >不知道怎么设置 ？</a
                 >
               </div>
@@ -411,7 +413,7 @@ const qqlogin=async()=>{
   .login-panel {
     width: 430px;
     margin-right: 15%;
-    margin-top: calc((100vh - 500px) / 2);
+    margin-top: calc((100vh - 430px) / 2);
     .login-register {
       padding: 25px;
       background: #fff;

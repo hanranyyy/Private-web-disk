@@ -1,3 +1,4 @@
+<!-- 修改密码 -->
 <template>
   <Dialog
     :show="dialogConfig.show"
@@ -61,6 +62,7 @@ const rules = {
     { validator: checkRePassword, message: '两次输入的密码不一致' },
   ],
 }
+// 弹窗
 const dialogConfig = ref({
   show: false,
   title: '修改密码',
@@ -83,6 +85,7 @@ const show = () => {
 }
 defineExpose({ show })
 const submitForm=()=>{
+  // 对表单数据进行验证
   formDataRef.value.validate(async (valid) => {
      if (!valid) {
        return;
@@ -96,7 +99,9 @@ const submitForm=()=>{
      if (!result) {
        return;
      }
+    //  隐藏对话框
      dialogConfig.value.show=false
+    //  显示提示消息
      proxy.Message.success('密码修改成功')
   });
 }

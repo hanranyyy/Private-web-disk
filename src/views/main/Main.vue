@@ -56,10 +56,12 @@
     >
       <template #fileName="{ index, row }">
         <div class="file-item" @mouseenter="showOP(row)" @mouseleave="cancelShowOp(row)">
+          <!-- fileType 1：视频 2：音频 3：图片 status 0：转码中 1：转码失败 2.转码成功-->
           <template v-if="(row.fileType == 3 || row.fileType == 1) && row.status == 2">
             <Icon :cover="row.fileCover" :width="32"></Icon>
           </template>
           <template v-else>
+            <!--folderType 0：文件 1：目录-->
             <Icon v-if="row.folderType == 0" :fileType="row.fileType"></Icon>
             <Icon v-if="row.folderType == 1" :fileType="0"></Icon>
           </template>
@@ -77,10 +79,13 @@
             >
               <template #suffix>{{ row.fileSuffix }}</template>
             </el-input>
+            <!-- 新建文件夹 -->
+            <!-- 输入东西才能点对号 -->
             <span
               :class="['iconfont icon-right1', row.fileNameReal ? '' : 'no-allow']"
               @click="saveNameEdit(index)"
             ></span>
+            <!-- 叉号 -->
             <span class="iconfont icon-error" @click="cancelNameEdit(index)"></span>
           </div>
           <span class="op">
@@ -202,10 +207,15 @@ const showLoading = ref(true)
 const category = ref()
 const loadDataList = async () => {
   let params = {
+    // 页码
     pageNo: tableData.value.pageNo,
+    // 分页大小
     pageSize: tableData.value.pageSize,
+    // 文件名
     fileNameFuzzy: fileNameFuzzy.value,
+    // 分类
     category: category.value,
+    // 文件父id
     filePid: currentFolder.value.fileId,
   }
   if (params.category != 'all') {
@@ -237,6 +247,7 @@ const editing = ref(false)
 const editNameRef = ref()
 // 新建文件夹
 const newFolder = () => {
+  // 已经处于编辑状态
   if (editing.value) {
     return
   }
@@ -244,7 +255,9 @@ const newFolder = () => {
   tableData.value.list.forEach((element) => {
     element.showEdit = false
   })
+  // 当前处于编辑状态
   editing.value = true
+  // 开头插入一个新的对象
   tableData.value.list.unshift({
     showEdit: true,
     fileType: 0,
@@ -252,26 +265,34 @@ const newFolder = () => {
     filePid: currentFolder.value.fileId,
   })
   nextTick(() => {
+    // 将焦点设置在编辑框上
     editNameRef.value.focus()
   })
 }
+// 取消编辑
 const cancelNameEdit = (index) => {
   const fileData = tableData.value.list[index]
   if (fileData.fileId) {
+    // 取消编辑状态
     fileData.showEdit = false
   } else {
+    // 数组中删除该文件数据对象
     tableData.value.list.splice(index, 1)
   }
+  // 不再处于编辑状态
   editing.value = false
 }
+// 新建目录
 const saveNameEdit = async (index) => {
   const { fileId, filePid, fileNameReal } = tableData.value.list[index]
   if (fileNameReal == '' || fileNameReal.indexOf('/') != -1) {
     proxy.Message.error('文件名不能为空且不能含斜杠')
     return
   }
+  // 重命名文件.
   let url = api.rename
   if (fileId == '') {
+    // 新建文件夹
     url = api.newFoloder
   }
   let result = await proxy.Request({
@@ -286,6 +307,7 @@ const saveNameEdit = async (index) => {
     return
   }
   tableData.value.list[index] = result.data
+  // 结束编辑
   editing.value = false
 }
 const editFileName = (index) => {
@@ -301,10 +323,16 @@ const editFileName = (index) => {
   currentData.showEdit = true
   // 编辑文件
   if (currentData.folderType == 0) {
+    // 文件名中去掉扩展名后的部分
     currentData.fileNameReal = currentData.fileName.substring(0, currentData.fileName.indexOf('.'))
+    // 文件名的扩展名部分
     currentData.fileSuffix = currentData.fileName.substring(currentData.fileName.indexOf('.'))
-  } else {
+  }
+  // 编辑文件夹 
+  else {
+    // 文件名
     currentData.fileNameReal = currentData.fileName
+    // 空字符串
     currentData.fileSuffix = ''
   }
   editing.value = true
