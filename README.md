@@ -1,7 +1,8 @@
-# Vue 3 + Vite
-
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+# 技术栈
+Vue3 + Vite + Vue-Router + Element-Plus + SCSS
+# 内容
+面向C端用户的网盘项目，包括用户注册，文件上传，分片上传，断点续传，秒传，文件在线预览，包括文本，图片，视频，音频，excel，word ，pdf 等文件在线预览，文件分享等功能。
+# 描述
+1. 采用SparkMD5对文件分片MD5，文件分片上传，使用Promise 完成多文件同时上传，文件开始上传，暂停上传。
+2. 采用多级目录线性展示，结合Vue-Router，刷新后任保持目录层级。
+3. 文件预览部分根据不同的文件类型，接受不同的数据类型，使用相应的插件完成文件的在线预览。
