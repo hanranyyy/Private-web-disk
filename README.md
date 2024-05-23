@@ -13,4 +13,34 @@ Vue3 + Vite + Vue-Router + Element-Plus + SCSS
 2. 采用多级目录线性展示，结合Vue-Router，刷新后任保持目录层级。
 3. 根据不同的文件类型，接受不同的数据类型，包括arraybuffer,blob,json类型的数据，使用不同的插件完成文件的在线预览。比如视频的分片播放，pdf,excel,word 在线预览。
 4. 文件分享，用户打开链接后需要输入分享码才可以读取文件，输入后，在一个会话内状态一直保持，session会话结束后，需要再次输入分享码。
+## 目录结构
+├── .vscode # vscode 配置
+
+├── public # 静态资源
+
+├── src # 项目代码
+
+│ ├── assets # 静态资源、icon、公共css
+
+│ ├── components # 公用组件
+
+│ ├── js # 定义了不同文件类型的类别及其允许的文件扩展名。
+
+│ ├── utils # 工具类、包括消息提示、request请求、校验
+
+│ ├── router # 路由配置
+
+│ ├── utils # 全局工具类
+
+│ ├── views # 路由页面
+
+│ ├── App.vue # 入口vue文件
+
+│ └── main.js # 主入口文件
+
+├── index.html # 入口页面
+
+├── package.json # 项目配置文件
+
+├── vite.config.js # vite 配置
 
